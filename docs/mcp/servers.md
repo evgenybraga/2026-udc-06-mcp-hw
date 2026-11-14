@@ -94,6 +94,34 @@ exists", which shows the data persists across chats.
 
 ---
 
+## Server 3 — catalog (our own, Task B)
+
+| | |
+|---|---|
+| **Why** | Exposes the seeded catalog domain to the agent as read-only tools, so answers come from the tested `app/` functions instead of the agent re-reading and re-computing the JSON. |
+| **Transport** | stdio |
+| **How it starts** | `node ${workspaceFolder}/mcp-server/dist/server.js` (from `.cursor/mcp.json`). Prerequisites: build `app/` (`npm install`, `npm run build`), then build the server (`npm install`, `npm run build` in `mcp-server/`); the server imports `../../app/dist/index.js`. |
+| **Scope** | Reads `app/data/catalog.json` only, via `loadCatalog()` from `app/dist`; no writes, no deletes, no network. All 4 tools declare `readOnlyHint: true`, `openWorldHint: false`. |
+| **Secrets** | None. |
+| **Version** | Our own code; SDK `@modelcontextprotocol/server` `2.4.0` locked in `mcp-server/package-lock.json` (`package.json` has `^2.0.0`). |
+
+**Tools it gave the agent (4, all read-only):**
+
+- `search_inventory(query)`
+- `check_stock(sku)` (an unknown SKU returns `isError`)
+- `low_stock()`
+- `inventory_value()`
+
+**Resource:** `inventory://catalog` (JSON: `productCount`, `categories`,
+`inventoryValue`).
+
+**Verification:** Cursor Customize > MCPs showed "catalog — 4 tools, 1
+resource enabled". MCP Inspector `resources/read` of `inventory://catalog`
+returned `productCount` 24, 7 categories and `inventoryValue` 46152. In the
+Task D run A the agent called `low_stock` and `inventory_value`.
+
+---
+
 ## What we did NOT connect and why
 
 - **git** and **fetch**: both need Python + uv. On top of that, fetch would pull
@@ -110,6 +138,8 @@ The most important row in each block above is **scope**. The filesystem
 server gets exactly `app/data` (passed as `${workspaceFolder}/app/data`), and
 the stderr confirms that this argument is the effective boundary in Cursor.
 That is enough because the catalog data is the only thing the agent needs to
-read through it. The memory server sees only its own JSONL file. Neither server
-has a secret, and the host most likely does not sandbox them, so the real limits are the
+read through it. The memory server sees only its own JSONL file. The catalog
+server reads only `app/data/catalog.json` through `loadCatalog()` and has no
+write, delete or network tools. None of the three
+servers has a secret, and the host most likely does not sandbox them, so the real limits are the
 scope argument, OS permissions and the per-call approval card.

@@ -5,7 +5,8 @@
 ```bash
 cp -r docs/templates/mcp-server ./mcp-server
 cd mcp-server && npm install
-cd ../app && npm run build && cd ..   # сервер імпортує app/dist
+cd ../app && npm run build   # сервер імпортує app/dist
+cd ../mcp-server && npm run build && cd ..   # creates mcp-server/dist/server.js
 ```
 
 Розкладка (важлива — не «спрощуйте» її):
@@ -52,6 +53,8 @@ API ще рухається, і сліпо скопійований зі ста�
 - логіка **імпортована** з `app/`, а не переписана заново
 
 ## Перевірка
+
+Run the commands below from `mcp-server/`.
 
 1. Сервер стартує без помилок: `node ./dist/server.js` (має просто висіти —
    він чекає на JSON-RPC у stdin, це нормально). Швидша перевірка, яка одразу
