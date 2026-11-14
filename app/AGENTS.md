@@ -47,3 +47,15 @@ them.
 
 <!-- Task A adds a "## MCPs" section here, documenting the servers this
      project expects to have connected and what each is for. -->
+
+## MCPs
+
+Configured in `.cursor/mcp.json` (Cursor, project-level). Both servers are
+stdio, version-pinned and need no secrets. Details: [docs/mcp/servers.md](../docs/mcp/servers.md).
+
+- **filesystem** (`@modelcontextprotocol/server-filesystem@2.3.0`): lets the
+  agent read the seeded catalog data. Scope: `app/data` only. Its write tools
+  can still modify `data/catalog.json`; do not approve writes there.
+- **memory** (`@modelcontextprotocol/server-memory@2.1.1`): persistent
+  knowledge graph for notes across chats. Scope: only its own JSONL file, no
+  repo access.
